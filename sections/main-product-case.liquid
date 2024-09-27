@@ -1,0 +1,245 @@
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js" integrity="sha512-HGOnQO9+SP1V92SrtZfjqxxtLmVzqZpjFFekvzZVWoiASSQgSr4cw9Kqd2+l8Llp4Gm0G8GIFJ4ddwZilcdb8A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css" integrity="sha512-yHknP1/AwR+yx26cB1y0cjvQUMvEa2PFzt1c9LlS4pRQ5NOTZFWbhBig+X9G9eYW/8m0/4OXNx8pxJ6z57x0dw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+  .product-info {
+    align-items: flex-start;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .product-gallery {
+    overflow: hidden;
+    position: relative;
+    width: 60%;
+  }
+
+  .product-gallery-items {
+    align-items: flex-start;
+    display: flex;
+    justify-content: flex-start;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .product-gallery-control {
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    align-items: center;  
+    bottom: 0;
+    position: absolute;
+    top: 0;
+    transition: .2s;
+    width: 20%;
+    z-index: 3;
+  }
+
+  .product-gallery-control:hover {
+    opacity: .6;
+  }
+
+  .product-gallery-prev {
+    left: 0;
+  }
+
+  .product-gallery-next {
+    right: 0;
+  }
+
+  .product-gallery-control svg {
+    height: 18px;
+  }
+
+  .product-gallery-items:not(.slick-slider) .product-gallery-item {
+    min-width: 100%;
+    width: 100%;
+  }
+
+  .product-gallery-item {
+    aspect-ratio: 1/1;
+    width: 100%;
+  }
+
+  .product-gallery-item img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .product-details {
+    width: calc(40% - 20px);
+  }
+
+  .product-variants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .product-variant {
+    align-items: center;
+    border: 1px solid #bdbdbd;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    white-space: nowrap;  
+  }
+
+  .product-variant:hover {
+    opacity: .6;
+  }
+
+  .product-variant.selected {
+    border: 1px solid #000;
+  }
+
+  .variant-thumbnail {
+    border-radius: 100px;
+    height: 30px;
+    width: 30px;
+  }
+
+  @media (min-width: 768px) {
+    .product-gallery:hover .product-gallery-prev,
+    .product-gallery:hover .product-gallery-next {
+      transform: translateX(0);
+    }
+
+    .product-gallery-prev {
+      transform: translateX(-100%);
+    }
+
+    .product-gallery-next {
+      transform: translateX(100%);
+    }
+  }
+</style>
+
+<section id="{{ section.id }}" class="main-product-case">
+  <div class="page-width">
+    <product-info class="product-info">
+      <product-media class="product-gallery" data-show-media-for-variant="{{ product.selected_or_first_available_variant.id }}">
+        <div class="product-gallery-control product-gallery-prev">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+            <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
+          </svg>
+        </div>
+        <div class="product-gallery-items">
+          {% for variant in product.variants %}
+            {% assign variant_gallery = variant.metafields.custom.gallery.value %}
+  
+            <div class="product-gallery-item" data-variant-id="{{ variant.id }}">
+              {{ variant.image | image_url: width: 800 | image_tag }}
+            </div>
+  
+            {% for media in variant_gallery %}
+              <div class="product-gallery-item" data-variant-id="{{ variant.id }}">
+                {{ media | image_url: width: 800 | image_tag }}
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+        <div class="product-gallery-control product-gallery-next">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+            <path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/>
+          </svg>
+        </div>
+      </product-media>
+      <product-details class="product-details">
+        <product-variants class="product-variants">
+          {% for variant in product.variants %}
+            {% assign variantColor = variant.metafields.custom.color.value %}
+
+            <variant class="product-variant {% if variant.id == product.selected_or_first_available_variant.id %}selected{% endif %}" data-variant-id="{{ variant.id }}">
+              <div class="variant-thumbnail" style="background-color: {{ variantColor }}">
+
+              </div>
+              {{ variant.title }}
+            </variant>
+          {% endfor %}
+        </product-variants>
+      </product-details>
+    </product-info>
+  </div>
+</section>
+
+<script>
+  let selectedVariantID = {{ product.selected_or_first_available_variant.id | json }};
+  const productVariants = document.querySelectorAll('.product-variant');
+
+  productVariants.forEach(variant => {
+    variant.addEventListener('click', () => {
+      selectedVariantID = variant.dataset.variantId;
+      filterSlick(selectedVariantID);
+      
+      // Update URL with the selected variant ID
+      const url = new URL(window.location);
+      url.searchParams.set('variant', selectedVariantID);
+      window.history.replaceState({}, '', url);
+
+      // Remove 'selected' class from all variants
+      productVariants.forEach(v => v.classList.remove('selected'));
+      
+      // Add 'selected' class to the clicked variant
+      variant.classList.add('selected');
+    });
+  });
+
+  function initializeSlick() {
+    $('.product-gallery-items').slick({
+      infinite: true,
+      arrows: false
+    });
+
+    filterSlick(selectedVariantID);
+  }
+
+  function filterSlick(variantID) {
+    // First, unfilter the slider to show all slides
+    $('.product-gallery-items').slick('slickUnfilter');
+
+    // Then, apply the slickFilter to filter slides based on data-variant-id
+    $('.product-gallery-items').slick('slickFilter', function(index, slide) {
+        // Find the .product-gallery-item within the slide
+        var productItem = $(slide).find('.product-gallery-item');
+        
+        // Return true to include the slide, false to exclude it
+        return productItem.data('variant-id') == variantID;
+    });
+  }
+
+  // Update Slick options to enable the controls
+  function initializeSlick() {
+    $('.product-gallery-items').slick({
+      infinite: true,
+      arrows: true,
+      prevArrow: '.product-gallery-prev',
+      nextArrow: '.product-gallery-next'
+    });
+
+    filterSlick(selectedVariantID);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeSlick();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Main Product Case",
+  "settings": [
+    
+  ],
+  "presets": [
+    {
+      "name": "Main Product Case"
+    }
+  ]
+}
+{% endschema %}
