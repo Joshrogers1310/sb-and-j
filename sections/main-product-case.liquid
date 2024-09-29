@@ -11,10 +11,20 @@
     justify-content: center;
   }
 
-  .product-gallery {
+  /* Product media gallery and thumbnails */
+  .product-media {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: flex-start;
     overflow: hidden;
     position: relative;
     width: 60%;
+  }
+
+  .product-gallery {
+    width: 100%;
   }
 
   .product-gallery-items {
@@ -70,14 +80,125 @@
     width: 100%;
   }
 
+  .product-thumbnails {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .product-thumbnails:not(.slick-slider) .product-gallery-thumbnail {
+    height: 50px;
+    width: 50px;
+  }
+
+  .product-thumbnails .slick-list {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .product-thumbnails .slick-list .slick-slide {
+    border-bottom: 2px solid transparent;
+  }
+
+  .product-thumbnails .slick-list .slick-slide.slick-current {
+    border-color: #000;
+  }
+  
+  .product-gallery-thumbnail {
+    aspect-ratio: 1/1;
+    cursor: pointer;
+  }
+
+  .product-gallery-thumbnail:hover {
+    opacity: .6;
+  }
+
+  .product-gallery-thumbnail img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+  
+  /* Product Details and form */
   .product-details {
     width: calc(40% - 20px);
+  }
+
+  .product-accordion-item {
+    border-bottom: 1px solid #bdbdbd;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .product-accordion-item:first-of-type {
+    border-top: 1px solid #bdbdbd;
+  }
+
+  .product-accordion-item.active .accordion-title:before {
+    opacity: 0;
+    transform: translateY(-50%) rotate(90deg);
+  }
+
+  .product-accordion-item.active .accordion-title:after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  .accordion-title {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-body-family);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 15px 0;
+    position: relative;
+    text-align: left;
+    transition: all .2s ease-in-out;
+    width: 100%;
+  }
+
+  .accordion-title:before {
+    content: '';
+    background-color: #000;;
+    height: 1px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    transition: .2s ease-in-out;
+    width: 11px;
+  }
+
+  .accordion-title:after {
+    content: '';
+    background-color: #000;;
+    height: 1px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: .2s ease-in-out;
+    width: 11px;
+  }
+
+  .accordion-content {
+    height: auto;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .2s ease-in-out;
+  }
+
+  .product-variant-label {
+    width: 100%;
   }
 
   .product-variants {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
+    gap: 6px;
   }
 
   .product-variant {
@@ -86,7 +207,8 @@
     cursor: pointer;
     display: flex;
     gap: 10px;
-    padding: 10px;
+    min-width: calc(33.333333% - 4px);
+    padding: 8px 10px;
     white-space: nowrap;  
   }
 
@@ -98,10 +220,20 @@
     border: 1px solid #000;
   }
 
-  .variant-thumbnail {
+  .product-variant .variant-thumbnail {
     border-radius: 100px;
-    height: 30px;
-    width: 30px;
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+  }
+
+  .product-buy-buttons {
+    width: 100%;
+  }
+
+  .product-buy-buttons button {
+    text-transform: uppercase;
+    width: 100%;
   }
 
   @media (min-width: 768px) {
@@ -123,46 +255,111 @@
 <section id="{{ section.id }}" class="main-product-case">
   <div class="page-width">
     <product-info class="product-info">
-      <product-media class="product-gallery" data-show-media-for-variant="{{ product.selected_or_first_available_variant.id }}">
-        <div class="product-gallery-control product-gallery-prev">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-            <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
-          </svg>
-        </div>
-        <div class="product-gallery-items">
+      <product-media class="product-media">
+        <product-gallery class="product-gallery" data-show-media-for-variant="{{ product.selected_or_first_available_variant.id }}">
+          <div class="product-gallery-control product-gallery-prev">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+              <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/>
+            </svg>
+          </div>
+          <div class="product-gallery-items">
+            {% for variant in product.variants %}
+              {% assign variant_gallery = variant.metafields.custom.gallery.value %}
+    
+              <div class="product-gallery-item" data-variant-id="{{ variant.id }}">
+                {{ variant.image | image_url: width: 800 | image_tag }}
+              </div>
+    
+              {% for media in variant_gallery %}
+                <div class="product-gallery-item" data-variant-id="{{ variant.id }}">
+                  {{ media | image_url: width: 800 | image_tag }}
+                </div>
+              {% endfor %}
+            {% endfor %}
+          </div>
+          <div class="product-gallery-control product-gallery-next">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+              <path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/>
+            </svg>
+          </div>
+        </product-gallery>
+        <product-thumbnails class="product-thumbnails" style="opacity: 0;">
           {% for variant in product.variants %}
             {% assign variant_gallery = variant.metafields.custom.gallery.value %}
   
-            <div class="product-gallery-item" data-variant-id="{{ variant.id }}">
+            <div class="product-gallery-thumbnail" data-variant-id="{{ variant.id }}">
               {{ variant.image | image_url: width: 800 | image_tag }}
             </div>
   
             {% for media in variant_gallery %}
-              <div class="product-gallery-item" data-variant-id="{{ variant.id }}">
+              <div class="product-gallery-thumbnail" data-variant-id="{{ variant.id }}">
                 {{ media | image_url: width: 800 | image_tag }}
               </div>
             {% endfor %}
           {% endfor %}
-        </div>
-        <div class="product-gallery-control product-gallery-next">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
-            <path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/>
-          </svg>
-        </div>
+        </product-thumbnails>
       </product-media>
       <product-details class="product-details">
-        <product-variants class="product-variants">
-          {% for variant in product.variants %}
-            {% assign variantColor = variant.metafields.custom.color.value %}
+        {% assign compatibleDevices = product.metafields.custom.compatible_devices %}
+        
+        {% if compatibleDevices != blank %}
+          <product-accordion class="product-accordion">
+            <div class="product-accordion-item compatible-devices">
+              <button class="accordion-title">Compatible Devices</button>
 
-            <variant class="product-variant {% if variant.id == product.selected_or_first_available_variant.id %}selected{% endif %}" data-variant-id="{{ variant.id }}">
-              <div class="variant-thumbnail" style="background-color: {{ variantColor }}">
-
+              <div class="accordion-content">
+                {% for device in compatibleDevices.value %}
+                  <div class="compatible-device">
+                    {{ device }}
+                  </div>
+                {% endfor %}
               </div>
-              {{ variant.title }}
-            </variant>
-          {% endfor %}
-        </product-variants>
+            </div>
+          </product-accordion>
+        {% endif %}
+        
+        {% form 'product', product %}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+
+          <product-variants class="product-variants">
+            <div class="product-variant-label">Color:<span class="label-value">{{ product.selected_or_first_available_variant.title }}</span></div>
+            {% for variant in product.variants %}
+              {% assign variantColor = variant.metafields.custom.color.value %}
+
+              <variant class="product-variant {% if variant.id == product.selected_or_first_available_variant.id %}selected{% endif %}" data-variant-name="{{ variant.title }}" data-variant-id="{{ variant.id }}">
+                {% if variantColor.alpha != 0.0 %}  
+                  <div class="variant-thumbnail" style="background-color: {{ variantColor }}"></div>
+                {% endif %}
+                {{ variant.title }}
+              </variant>
+            {% endfor %}
+          </product-variants>
+
+          <buy-buttons class="product-buy-buttons">
+            <button type="submit" class="button primary" data-action="add-to-cart">
+              Add to cart
+            </button>
+          </buy-buttons>
+
+        {% endform %}
+        
+        {% assign productDescription = product.description %}
+        {% assign productDropdowns = product.metafields.custom.product_dropdowns.value %}
+
+        {% if productDescription != blank or productDropdowns != blank %}
+          <product-dropdowns class="product-dropdowns product-accordion">
+            {% for dropdownObject in productDropdowns %}
+              <div class="product-dropdown product-accordion-item">
+                <button class="accordion-title">{{ dropdownObject.dropdown_title }}</button>
+
+                <div class="accordion-content">
+                  {{ dropdownObject.dropdown_content }}
+                </div>
+              </div>
+            {% endfor %}
+          </product-dropdowns>
+        {% endif %}
       </product-details>
     </product-info>
   </div>
@@ -170,6 +367,9 @@
 
 <script>
   let selectedVariantID = {{ product.selected_or_first_available_variant.id | json }};
+  const productThumbnails = document.querySelector('.product-thumbnails');
+  const hiddenInput = document.querySelector('input[name="id"]');
+  const productVariantLabel = document.querySelector('.product-variant-label .label-value');
   const productVariants = document.querySelectorAll('.product-variant');
 
   productVariants.forEach(variant => {
@@ -187,21 +387,71 @@
       
       // Add 'selected' class to the clicked variant
       variant.classList.add('selected');
+
+      // Update the hidden input value to match the selected variant ID
+      if (hiddenInput) {
+        hiddenInput.value = selectedVariantID;
+      }
+
+      // Update the productVariantLabel with the data-variant-name attribute
+      if (productVariantLabel) {
+        productVariantLabel.textContent = variant.dataset.variantName;
+      }
     });
   });
+
+  document.querySelectorAll('.accordion-title').forEach(button => {
+    button.addEventListener('click', () => {
+        const accordionItem = button.parentElement;
+        const accordionContent = button.nextElementSibling;
+
+        // If the item is active, collapse it
+        if (accordionItem.classList.contains('active')) {
+            accordionContent.style.maxHeight = null;
+            accordionItem.classList.remove('active');
+        } else {
+            // Collapse other open accordions
+            document.querySelectorAll('.accordion-item').forEach(item => {
+                const content = item.querySelector('.accordion-content');
+                if (item !== accordionItem) {
+                    item.classList.remove('active');
+                    content.style.maxHeight = null;
+                }
+            });
+
+            // Expand the clicked accordion
+            accordionItem.classList.add('active');
+            accordionContent.style.maxHeight = accordionContent.scrollHeight + 'px';
+        }
+    });
+});
+
 
   function initializeSlick() {
     $('.product-gallery-items').slick({
       infinite: true,
-      arrows: false
+      arrows: true,
+      prevArrow: '.product-gallery-prev',
+      nextArrow: '.product-gallery-next',
+      asNavFor: '.product-thumbnails'
+    });
+
+    $('.product-thumbnails').slick({
+      infinite: true,
+      arrows: false,
+      slidesToShow: 8,
+      focusOnSelect: true,
+      asNavFor: '.product-gallery-items'
     });
 
     filterSlick(selectedVariantID);
+    productThumbnails.style.opacity = 1;
   }
 
   function filterSlick(variantID) {
     // First, unfilter the slider to show all slides
     $('.product-gallery-items').slick('slickUnfilter');
+    $('.product-thumbnails').slick('slickUnfilter');
 
     // Then, apply the slickFilter to filter slides based on data-variant-id
     $('.product-gallery-items').slick('slickFilter', function(index, slide) {
@@ -211,18 +461,15 @@
         // Return true to include the slide, false to exclude it
         return productItem.data('variant-id') == variantID;
     });
-  }
 
-  // Update Slick options to enable the controls
-  function initializeSlick() {
-    $('.product-gallery-items').slick({
-      infinite: true,
-      arrows: true,
-      prevArrow: '.product-gallery-prev',
-      nextArrow: '.product-gallery-next'
+    // Then, apply the slickFilter to filter slides based on data-variant-id
+    $('.product-thumbnails').slick('slickFilter', function(index, slide) {
+        // Find the .product-gallery-item within the slide
+        var productItem = $(slide).find('.product-gallery-thumbnail');
+        
+        // Return true to include the slide, false to exclude it
+        return productItem.data('variant-id') == variantID;
     });
-
-    filterSlick(selectedVariantID);
   }
 
   document.addEventListener('DOMContentLoaded', function() {
