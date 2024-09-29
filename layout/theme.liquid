@@ -296,6 +296,11 @@
         document.documentElement.classList.add('shopify-design-mode');
       }
     </script>
+
+    <script>
+      var Shopify = Shopify || {};
+      Shopify.money_format = "{{ shop.money_format }}";
+    </script>
   </head>
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
