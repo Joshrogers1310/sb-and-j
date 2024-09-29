@@ -1,0 +1,200 @@
+{% liquid 
+  assign product_list = product.metafields.custom.recommended_products.value
+%}
+
+<style>
+  #section-product-recommendations {
+    padding: 60px 0;
+  }
+
+  .product-recs-title h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .product-list {
+    align-items: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    row-gap: 20px;
+  }
+
+  .product-card {
+    display: inline-block;
+    padding: 0 5px;
+    width: 50%;
+  }
+
+  .product-card * {
+    color: rgb(var(--color-foreground));
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .product-url {
+    display: block;
+  }
+
+  .product-card .product-card__image {
+    aspect-ratio: 1/1;
+    width: 100%;
+  }
+
+  .product-card .product-card__image img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .product-card__title {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin: 5px 0;
+  }
+
+  .product-card__price {
+    margin: 0;
+  }
+
+  @media (min-width: 640px) and (max-width: 992px) {
+    #section-product-recommendations {
+      padding: 80px 0;
+    }
+
+    .product-recs-title h3 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .product-card {
+      min-width: calc(100% / 3);
+      width: calc(100% / 3);
+    }
+  }
+
+  @media (min-width: 992px) {
+    #section-product-recommendations {
+      padding: 80px 0;
+    }
+
+    .product-recs-title h3 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .product-card {
+      min-width: 25%;
+      width: 25%;
+    }
+  }
+</style>
+
+<section id="section-product-recommendations">
+  <div class="page-width">
+    {% if product_list != blank %}
+      <div class="product-recs-title">
+        <h3>{{ section.settings.title }}</h3>
+      </div>
+
+      <product-list class="product-list">
+        {% for product in product_list %}
+          <product-card class="product-card">
+            <a href="{{ product.url }}" class="product-url">
+              <div class="product-card__image">
+                {{ product.featured_image | image_url: width: 400 | image_tag: class: 'product-card__image-img' }}
+              </div>  
+              <p class="product-card__title">{{ product.title }}</p>
+              <p class="product-card__price">{{ product.price | money }}</p>
+            </a>
+          </product-card>
+        {% endfor %}
+      </product-list>
+    {% else %}
+      <div class="product-recs-title">
+        <h3>{{ section.settings.title  }}</h3>
+      </div>
+      {% if recommendations.performed? %}
+        <product-list class="product-list">
+          {% if recommendations.products_count > 0 %}
+            {% for product in recommendations.products %}
+              <product-card class="product-card">
+                <a href="{{ product.url }}" class="product-url">
+                  <div class="product-card__image">
+                    {{ product.featured_image | image_url: width: 400 | image_tag: class: 'product-card__image-img' }}
+                  </div>  
+                  <p class="product-card__title">{{ product.title }}</p>
+                  <p class="product-card__price">{{ product.price | money }}</p>
+                </a>
+              </product-card>
+            {% endfor %}
+          {% endif %}
+          </product-list>
+      {% else %}
+        <product-list id="product-recommendations" class="product-list">
+
+        </product-list>
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            const productId = {{ product.id }};
+            const recommendationsContainer = document.getElementById('product-recommendations');
+            const limit = 4;
+
+            fetch(`/recommendations/products.json?product_id=${productId}&limit=${limit}`)
+              .then(response => response.json())
+              .then(data => {
+                console.log(data);
+                if (data.products.length) {
+                  let productCard;
+
+                  data.products.forEach(product => {
+                    productCard = `
+                    <product-card class="product-card">
+                      <a href="${product.url}" class="product-url">
+                        <div class="product-card__image">
+                          <img class="product-card__image-img" src="${product.featured_image}" alt="${product.title}" width="400" height="400">
+                        </div>  
+                        <p class="product-card__title">${product.title}</p>
+                        <p class="product-card__price">${Shopify.formatMoney(product.price)}</p>
+                      </a>
+                    </product-card>
+                    `;
+
+                    recommendationsContainer.innerHTML += productCard;
+                  });
+                }
+              })
+              .catch(err => {
+                console.error("Failed to fetch product recommendations: ", err);
+              });
+          });  
+        </script>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product Recommendations",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Product Recommendations"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Recommendations"
+    }
+  ]
+}
+{% endschema %}
