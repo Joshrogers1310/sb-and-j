@@ -1,10 +1,39 @@
 {
   "sections": {
     "main": {
-      "type": "main-product-case"
+      "type": "main-product-case",
+      "settings": {
+      }
+    },
+    "graphic_banner_47kcep": {
+      "type": "graphic-banner",
+      "settings": {
+        "desktop_height": 800,
+        "mobile_height": 450,
+        "desktop_image": "{{ product.metafields.custom.graphic_banner_1_desktop_.value }}",
+        "mobile_image": "{{ product.metafields.custom.graphic_banner_1_mobile_.value }}"
+      }
+    },
+    "graphic_banner_47yEY7": {
+      "type": "graphic-banner",
+      "settings": {
+        "desktop_height": 800,
+        "mobile_height": 450,
+        "desktop_image": "{{ product.metafields.custom.graphic_banner_2_desktop_.value }}",
+        "mobile_image": "{{ product.metafields.custom.graphic_banner_2_mobile_.value }}"
+      }
+    },
+    "product_recs_UxUVAp": {
+      "type": "product-recs",
+      "settings": {
+        "title": "Product Recommendations"
+      }
     }
   },
   "order": [
-    "main"
-  ] 
+    "main",
+    "graphic_banner_47kcep",
+    "graphic_banner_47yEY7",
+    "product_recs_UxUVAp"
+  ]
 }
