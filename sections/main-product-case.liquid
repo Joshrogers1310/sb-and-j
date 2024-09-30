@@ -242,6 +242,12 @@
     border: 1px solid #000;
   }
 
+  .product-variant.unavailable {
+    background-color: rgba(23, 23, 23, 0.05);
+    opacity: .6;
+    pointer-events: none;
+  }
+
   .product-variant .variant-thumbnail {
     border-radius: 100px;
     display: inline-block;
@@ -388,7 +394,7 @@
             {% for variant in product.variants %}
               {% assign variantColor = variant.metafields.custom.color.value %}
 
-              <variant class="product-variant {% if variant.id == product.selected_or_first_available_variant.id %}selected{% endif %}" data-variant-price="{{ variant.price }}" data-variant-name="{{ variant.title }}" data-variant-id="{{ variant.id }}">
+              <variant class="product-variant {% if variant.id == product.selected_or_first_available_variant.id %}selected{% endif %} {% unless product.available %}unavailable{% endunless %}" data-variant-price="{{ variant.price }}" data-variant-name="{{ variant.title }}" data-variant-id="{{ variant.id }}">
                 {% if variantColor.alpha != 0.0 %}  
                   <div class="variant-thumbnail" style="background-color: {{ variantColor }}"></div>
                 {% endif %}
