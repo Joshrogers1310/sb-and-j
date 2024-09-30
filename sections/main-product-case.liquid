@@ -262,6 +262,10 @@
     .product-info {
       flex-direction: column;
     }
+
+    .product-buy-buttons button:hover {
+      opacity: .6;
+    }
   }
 
   @media (min-width: 768px) {
@@ -294,6 +298,11 @@
     .product-price .price {
       font-size: 26px;
     }
+
+    .product-buy-buttons button:hover {
+      background-color: white;
+      color: #000;
+    } 
   }
 </style>
 
@@ -401,6 +410,15 @@
 
         {% if productDescription != blank or productDropdowns != blank %}
           <product-dropdowns class="product-dropdowns product-accordion">
+            {% if productDropdowns != blank %}
+              <div class="product-dropdown product-accordion-item">
+                <button class="accordion-title">Description</button>
+
+                <div class="accordion-content">
+                  {{ product.description }}
+                </div>
+              </div>
+            {% endif %}
             {% for dropdownObject in productDropdowns %}
               <div class="product-dropdown product-accordion-item">
                 <button class="accordion-title">{{ dropdownObject.dropdown_title }}</button>
