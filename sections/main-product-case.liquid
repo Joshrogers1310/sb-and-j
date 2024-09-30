@@ -9,6 +9,7 @@
     display: flex;
     gap: 20px;
     justify-content: center;
+    margin-bottom: 30px;
   }
 
   /* Product media gallery and thumbnails */
@@ -20,7 +21,7 @@
     justify-content: flex-start;
     overflow: hidden;
     position: relative;
-    width: 60%;
+    width: 100%;
   }
 
   .product-gallery {
@@ -123,8 +124,28 @@
   }
   
   /* Product Details and form */
+  
   .product-details {
-    width: calc(40% - 20px);
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .product-details > * {
+    width: 100%;
+  }
+  
+  .product-name h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 0;
+  }
+
+  .product-price .price {
+    font-size: 20px;
   }
 
   .product-accordion-item {
@@ -199,6 +220,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+    margin-bottom: 30px;
   }
 
   .product-variant {
@@ -236,7 +258,17 @@
     width: 100%;
   }
 
+  @media (max-width: 768px) {
+    .product-info {
+      flex-direction: column;
+    }
+  }
+
   @media (min-width: 768px) {
+    .product-media {
+      width: 60%;
+    }
+
     .product-gallery:hover .product-gallery-prev,
     .product-gallery:hover .product-gallery-next {
       transform: translateX(0);
@@ -248,6 +280,19 @@
 
     .product-gallery-next {
       transform: translateX(100%);
+    }
+
+    .product-details {
+      gap: 40px;
+      width: calc(40% - 20px);
+    }
+
+    .product-name h1 {
+      font-size: 40px;
+    }
+
+    .product-price .price {
+      font-size: 26px;
     }
   }
 </style>
@@ -300,6 +345,9 @@
         </product-thumbnails>
       </product-media>
       <product-details class="product-details">
+        <product-name class="product-name">
+          <h1>{{ product.title }}</h1>
+        </product-name>
         {% assign compatibleDevices = product.metafields.custom.compatible_devices %}
         
         {% if compatibleDevices != blank %}
@@ -317,6 +365,10 @@
             </div>
           </product-accordion>
         {% endif %}
+
+        <product-price class="product-price">
+          <span class="price">{{ product.selected_or_first_available_variant.price | money }}</span>
+        </product-price>
         
         {% form 'product', product %}
           <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
@@ -327,7 +379,7 @@
             {% for variant in product.variants %}
               {% assign variantColor = variant.metafields.custom.color.value %}
 
-              <variant class="product-variant {% if variant.id == product.selected_or_first_available_variant.id %}selected{% endif %}" data-variant-name="{{ variant.title }}" data-variant-id="{{ variant.id }}">
+              <variant class="product-variant {% if variant.id == product.selected_or_first_available_variant.id %}selected{% endif %}" data-variant-price="{{ variant.price }}" data-variant-name="{{ variant.title }}" data-variant-id="{{ variant.id }}">
                 {% if variantColor.alpha != 0.0 %}  
                   <div class="variant-thumbnail" style="background-color: {{ variantColor }}"></div>
                 {% endif %}
@@ -396,6 +448,12 @@
       // Update the productVariantLabel with the data-variant-name attribute
       if (productVariantLabel) {
         productVariantLabel.textContent = variant.dataset.variantName;
+      }
+
+      // Update the price
+      const priceElement = document.querySelector('.product-price .price');
+      if (priceElement) {
+        priceElement.textContent = Shopify.formatMoney(variant.dataset.variantPrice);
       }
     });
   });
